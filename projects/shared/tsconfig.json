@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": false,
+    "erasableSyntaxOnly": false,
+    "noEmit": true,
+    "composite": true,
+    "declaration": true
+  },
+  "include": ["src"],
+  // 声明对 api 项目的依赖 - 允许跨项目类型引用
+  "references": [{ "path": "../api" }]
+}

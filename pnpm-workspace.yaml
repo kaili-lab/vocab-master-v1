@@ -1,0 +1,3 @@
+packages:
+  - "projects/*"
+  - "projects/*/*" # 添加这一行来包含子项目

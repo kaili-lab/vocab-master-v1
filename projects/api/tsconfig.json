@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": ["ESNext"],
+    "types": ["vitest/globals"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    // 启用项目引用支持 - 允许 shared 项目引用此项目的类型
+    "composite": true,
+    // 生成类型声明文件 - composite 模式必需
+    "declaration": true,
+    // 🎯 只生成 .d.ts，不生成 .js，tsc --noEmit 只做类型检查
+    "emitDeclarationOnly": true,
+    "outDir": "dist" // 输出到 dist 目录
+  }
+}

@@ -1,0 +1,30 @@
+// 根配置文件（协调者）不直接编译任何文件，只负责引用其他配置
+// 为什么要分两个子配置文件？
+// 环境隔离：浏览器代码和 Node.js 代码有不同的类型定义
+// tsconfig.app.json 有 DOM 类型
+// tsconfig.node.json 有 node 类型
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+  // 不应该也不需要配置 compilerOptions，两个子配置文件已经配置过了
+  // "compilerOptions": {
+  //   "baseUrl": "src",
+  //   "paths": {
+  //     "@/*": ["*"]
+  //   }
+  // }
+}
+
+/*
+tsconfig系列文件，核心目的就是进行⭐⭐类型检查⭐⭐相关的配置；
+├── tsconfig.json           ← TypeScript 编译器的配置，它作为汇总用
+├── tsconfig.app.json       ← 指定⭐应用代码⭐如何⭐类型检查⭐
+├── tsconfig.node.json      ← 指定⭐构建工具⭐如何⭐类型检查⭐
+├── vite.config.ts          ← Vite 的真实构建配置 ✅
+├── .eslintrc.json          ← ESLint 的配置（独立）
+├── prettier.config.js      ← Prettier 的配置（独立）
+└── package.json            ← npm 的配置（独立）
+*/

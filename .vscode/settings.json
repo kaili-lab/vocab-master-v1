@@ -1,0 +1,5 @@
+{
+  "typescript.tsdk": "projects/client/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "postman.settings.dotenv-detection-notification-visibility": false
+}

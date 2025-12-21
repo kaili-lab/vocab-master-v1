@@ -5,10 +5,10 @@
   "compatibility_date": "2025-10-11",
   "dev": {
     "port": 3000
-  }
-  // "compatibility_flags": [
-  //   "nodejs_compat"
-  // ],
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },

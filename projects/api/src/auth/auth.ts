@@ -6,6 +6,7 @@ import * as schema from "../db/schema";
 import { type Bindings } from "../types/bindings";
 import { getEnv } from "../utils/env";
 import { createFreeSubscription } from "../service/auth.service"; // 🆕 导入订阅初始化函数
+import { EmailService } from "../service/email.service"; // 🆕 导入邮件服务
 
 /**
  * 创建 Better Auth 实例
@@ -114,7 +115,20 @@ export const createAuth = (env: Bindings) => {
       // 发送重置密码邮件的钩子
       sendResetPassword: async ({ user, url }) => {
         console.log(`🔐 [sendResetPassword] to ${user.email}: ${url}`);
-        // TODO: 实现发送重置密码邮件的逻辑
+
+        // 🆕 发送重置密码邮件
+        const emailService = new EmailService(config.RESEND_API_KEY);
+        const result = await emailService.sendPasswordResetEmail(
+          user.email,
+          user.name,
+          url
+        );
+        if (result.success) {
+          console.log(`✅ [sendResetPassword] 邮件发送成功`);
+        } else {
+          console.error(`❌ [sendResetPassword] 邮件发送失败: ${result.error}`);
+          // 注意：不抛出错误，避免阻断重置密码流程
+        }
       },
     },
 
@@ -138,12 +152,22 @@ export const createAuth = (env: Bindings) => {
           );
         }
 
-        // TODO: 实现邮件发送逻辑
-        // await sendEmail({
-        //   to: user.email,
-        //   subject: "验证您的 Vocab Master 账号",
-        //   html: `请点击链接验证: <a href="${url}">验证邮箱</a>`
-        // });
+        // 🆕 发送验证邮件
+        const emailService = new EmailService(config.RESEND_API_KEY);
+        const result = await emailService.sendVerificationEmail(
+          user.email,
+          user.name,
+          url
+        );
+        if (result.success) {
+          console.log(`✅ [sendVerificationEmail] 邮件发送成功`);
+        } else {
+          console.error(
+            `❌ [sendVerificationEmail] 邮件发送失败: ${result.error}`
+          );
+          // 注意：不抛出错误，避免阻断注册流程
+          // 即使邮件发送失败，用户仍然可以注册成功
+        }
       },
       sendOnSignUp: true, // 🔑 关键配置：注册时自动发送验证邮件
       autoSignInAfterVerification: false, // 验证后需要手动登录

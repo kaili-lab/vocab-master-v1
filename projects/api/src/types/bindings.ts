@@ -13,6 +13,9 @@ export type Bindings = {
 
   AIHUBMIX_API_KEY: string;
 
+  // Resend 邮件服务
+  RESEND_API_KEY: string;
+
   // 服务器配置（可选）
   PORT?: string;
   NODE_ENV?: string;

@@ -83,9 +83,9 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
 
       {/* 主内容区 */}
       <div className="container mx-auto px-4 py-8 sm:py-12 lg:py-16">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 ">
           {/* 左侧：品牌介绍 */}
-          <div className="hidden lg:block space-y-6">
+          <div className="hidden lg:block space-y-6 w-full">
             <Link
               to="/"
               className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition group"
@@ -93,38 +93,37 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
               <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
               返回首页
             </Link>
+            <div className="w-full flex flex-col items-center">
+              <div>
+                <h1 className="text-4xl xl:text-5xl font-bold text-foreground mb-4 leading-tight text-center">
+                  智能学习
+                  <br />
+                  <span className="inline-block mt-4 bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                    高效记忆
+                  </span>
+                </h1>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  基于 AI 的个性化词汇学习系统， 让每个单词都记得更牢固
+                </p>
+              </div>
 
-            <div>
-              <h1 className="text-4xl xl:text-5xl font-bold text-foreground mb-4 leading-tight">
-                智能学习
-                <br />
-                <span className="bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                  高效记忆
-                </span>
-              </h1>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                基于 AI 的个性化词汇学习系统，
-                <br />
-                让每个单词都记得更牢固
-              </p>
-            </div>
-
-            {/* 特点列表 */}
-            <div className="space-y-4 pt-8">
-              {[
-                "🎯 智能识别你不认识的单词",
-                "🤖 AI 提供精准的上下文解释",
-                "📚 个性化词汇库自动管理",
-                "🔄 科学的间隔复习系统",
-              ].map((feature, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-3 text-foreground"
-                >
-                  <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  <span>{feature}</span>
-                </div>
-              ))}
+              {/* 特点列表 */}
+              <div className="space-y-4 pt-8">
+                {[
+                  "🎯 智能识别你不认识的单词",
+                  "🤖 AI 提供精准的上下文解释",
+                  "📚 个性化词汇库自动管理",
+                  "🔄 科学的间隔复习系统",
+                ].map((feature, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center space-x-3 text-foreground"
+                  >
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

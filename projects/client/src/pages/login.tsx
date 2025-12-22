@@ -6,7 +6,6 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -29,14 +28,12 @@ const phoneLoginSchema = z.object({
     .string()
     .length(6, "验证码必须是6位数字")
     .regex(/^\d+$/, "验证码只能是数字"),
-  rememberMe: z.boolean().optional(),
 });
 
 // 邮箱登录 Schema
 const emailLoginSchema = z.object({
   email: z.string().min(1, "请输入邮箱").email("请输入正确的邮箱格式"),
   password: z.string().min(6, "密码至少6位"),
-  rememberMe: z.boolean().optional(),
 });
 
 type PhoneLoginForm = z.infer<typeof phoneLoginSchema>;
@@ -56,7 +53,6 @@ export default function LoginPage() {
     defaultValues: {
       phone: "",
       smsCode: "",
-      rememberMe: false,
     },
   });
 
@@ -66,7 +62,6 @@ export default function LoginPage() {
     defaultValues: {
       email: "",
       password: "",
-      rememberMe: false,
     },
   });
 
@@ -144,7 +139,7 @@ export default function LoginPage() {
       const result = await signIn.email({
         email: data.email,
         password: data.password,
-        rememberMe: data.rememberMe,
+        rememberMe: true, // 默认保持长时间登录
       });
 
       if (result.error) {
@@ -244,24 +239,6 @@ export default function LoginPage() {
                   )}
                 />
 
-                <FormField
-                  control={phoneForm.control}
-                  name="rememberMe"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormLabel className="text-sm font-normal cursor-pointer">
-                        记住我
-                      </FormLabel>
-                    </FormItem>
-                  )}
-                />
-
                 <Button
                   type="submit"
                   className="w-full shadow-md"
@@ -335,32 +312,6 @@ export default function LoginPage() {
                     </FormItem>
                   )}
                 />
-
-                <div className="flex items-center justify-between">
-                  <FormField
-                    control={emailForm.control}
-                    name="rememberMe"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel className="text-sm font-normal cursor-pointer">
-                          记住我
-                        </FormLabel>
-                      </FormItem>
-                    )}
-                  />
-                  <Link
-                    to="/forgot-password"
-                    className="text-sm text-primary hover:underline"
-                  >
-                    忘记密码？
-                  </Link>
-                </div>
 
                 <Button
                   type="submit"

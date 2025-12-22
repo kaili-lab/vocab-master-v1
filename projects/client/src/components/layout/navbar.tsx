@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Moon, Sun, LogOut } from "lucide-react";
 
 import { useTheme } from "@/hooks/use-theme";
@@ -32,11 +32,12 @@ const navLinks = [
   { label: "复习", href: "/review" },
 ];
 
-export function DashboardNavbar() {
+export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { mode, style, setStyle, toggleMode } = useTheme();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   // 判断链接是否激活
   const isLinkActive = (href: string) => {
@@ -46,9 +47,13 @@ export function DashboardNavbar() {
   // 类型断言
   const extendedUser = user as ExtendedUser | undefined;
 
-  // 获取词汇等级显示信息
-  const vocabDisplay = getVocabularyDisplay(extendedUser?.vocabularyLevel);
-  const badgeText = `${vocabDisplay.label} · ${vocabDisplay.wordCount}词`;
+  // 获取词汇等级显示信息（仅在已登录时）
+  const vocabDisplay = isAuthenticated
+    ? getVocabularyDisplay(extendedUser?.vocabularyLevel)
+    : null;
+  const badgeText = vocabDisplay
+    ? `${vocabDisplay.label} · ${vocabDisplay.wordCount}词`
+    : "";
 
   const handleSignOut = () => {
     signOut();
@@ -75,30 +80,33 @@ export function DashboardNavbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-2">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                to={link.href}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
-                  isLinkActive(link.href)
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {isAuthenticated && extendedUser?.vocabularyLevel &&
+              navLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className={`px-4 py-2 rounded-lg font-medium transition ${
+                    isLinkActive(link.href)
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
           </div>
 
           {/* Right Side */}
           <div className="flex items-center space-x-3">
             {/* 词汇等级 Badge - Desktop */}
-            <Badge
-              variant="secondary"
-              className="hidden lg:flex bg-primary/10 text-primary hover:bg-primary/20"
-            >
-              {badgeText}
-            </Badge>
+            {isAuthenticated && extendedUser?.vocabularyLevel && (
+              <Badge
+                variant="secondary"
+                className="hidden lg:flex bg-primary/10 text-primary hover:bg-primary/20"
+              >
+                {badgeText}
+              </Badge>
+            )}
 
             {/* 主题切换 - Desktop */}
             <div className="hidden md:flex items-center space-x-2">
@@ -130,26 +138,44 @@ export function DashboardNavbar() {
               </Button>
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="w-9 h-9 bg-linear-to-br from-primary to-primary/80 rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform">
-                  <span className="text-primary-foreground text-sm font-semibold">
-                    KE
-                  </span>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {/* <DropdownMenuLabel>我的账户</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>个人资料</DropdownMenuItem>
-                <DropdownMenuItem>设置</DropdownMenuItem> */}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  登出
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* 未登录时的按钮组 - Desktop */}
+            {!isAuthenticated && (
+              <>
+                <Button
+                  variant="ghost"
+                  className="h-9 hidden md:flex"
+                  onClick={() => navigate("/login")}
+                >
+                  登录
+                </Button>
+                <Button
+                  className="h-9 shadow-md hidden md:flex"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  开始使用
+                </Button>
+              </>
+            )}
+
+            {/* 已登录时的用户头像菜单 */}
+            {isAuthenticated && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="w-9 h-9 bg-linear-to-br from-primary to-primary/80 rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform">
+                    <span className="text-primary-foreground text-sm font-semibold">
+                      KE
+                    </span>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    登出
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             {/* Mobile Menu Button */}
             <Button
@@ -171,35 +197,39 @@ export function DashboardNavbar() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-border space-y-3">
-            {/* Navigation Links */}
-            <div className="flex flex-col space-y-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  to={link.href}
-                  className={`px-4 py-2 rounded-lg font-medium transition ${
-                    isLinkActive(link.href)
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
+            {/* Navigation Links - 仅在已登录且已设置词汇等级时显示 */}
+            {isAuthenticated && extendedUser?.vocabularyLevel && (
+              <div className="flex flex-col space-y-2">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    className={`px-4 py-2 rounded-lg font-medium transition ${
+                      isLinkActive(link.href)
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            )}
 
-            {/* Divider */}
-            <div className="border-t border-border my-3" />
+            {/* Divider - 仅在已登录且已设置词汇等级时显示 */}
+            {isAuthenticated && extendedUser?.vocabularyLevel && <div className="border-t border-border my-3" />}
 
-            {/* 词汇等级 */}
-            <Badge
-              variant="secondary"
-              className="w-fit bg-primary/10 text-primary"
-            >
-              {badgeText}
-            </Badge>
+            {/* 词汇等级 - 仅在已登录且已设置词汇等级时显示 */}
+            {isAuthenticated && extendedUser?.vocabularyLevel && (
+              <Badge
+                variant="secondary"
+                className="w-fit bg-primary/10 text-primary"
+              >
+                {badgeText}
+              </Badge>
+            )}
 
-            {/* Theme Controls */}
+            {/* Theme Controls - 始终显示 */}
             <div className="flex items-center space-x-2">
               <Select
                 value={style}
@@ -227,9 +257,29 @@ export function DashboardNavbar() {
                 )}
               </Button>
             </div>
+
+            {/* 未登录时的按钮 */}
+            {!isAuthenticated && (
+              <>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => navigate("/login")}
+                >
+                  登录
+                </Button>
+                <Button
+                  className="w-full shadow-md"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  开始使用
+                </Button>
+              </>
+            )}
           </div>
         )}
       </div>
     </nav>
   );
 }
+

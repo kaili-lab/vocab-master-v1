@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import type { ExtendedUser } from "@/lib/api-client";
 
-import { DashboardNavbar } from "@/components/layout/dashboard-navbar";
+import { Navbar } from "@/components/layout/navbar";
 import ArticleAnalysis from "@/components/dashboard/article-analysis";
 
 export default function DashboardPage() {
@@ -28,7 +28,7 @@ export default function DashboardPage() {
   // 正常显示 Dashboard 内容
   return (
     <div className="min-h-screen bg-background">
-      <DashboardNavbar />
+      <Navbar />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         <ArticleAnalysis />

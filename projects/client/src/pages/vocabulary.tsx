@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { DashboardNavbar } from "@/components/layout/dashboard-navbar";
+import { Navbar } from "@/components/layout/navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Archive, Loader2 } from "lucide-react";
@@ -427,7 +427,7 @@ export default function VocabularyPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardNavbar />
+      <Navbar />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 max-w-7xl">
         <Tabs

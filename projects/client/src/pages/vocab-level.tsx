@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { LandingNavbar } from "@/components/layout/landing-navbar";
+import { Navbar } from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -59,7 +59,7 @@ export default function VocabLevelSelection() {
   return (
     <div className="min-h-screen bg-background">
       {/* NavBar */}
-      <LandingNavbar />
+      <Navbar />
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 lg:py-12 max-w-4xl">
         <div className="bg-card rounded-3xl shadow-xl p-6 sm:p-8 lg:p-10">

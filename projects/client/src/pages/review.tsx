@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { DashboardNavbar } from "@/components/layout/dashboard-navbar";
+import { Navbar } from "@/components/layout/navbar";
 import ReviewEntrance from "@/components/review/ReviewEntrance";
 import ReviewSession from "@/components/review/ReviewSession";
 import ReviewComplete from "@/components/review/ReviewComplete";
@@ -55,7 +55,7 @@ export default function ReviewPage() {
   if (isLoading) {
     return (
       <>
-        <DashboardNavbar />
+        <Navbar />
         <div className="min-h-screen bg-linear-to-br from-background to-muted p-4 md:p-8 flex items-center justify-center">
           <div className="text-center">
             <div className="text-lg text-muted-foreground">加载中...</div>
@@ -68,7 +68,7 @@ export default function ReviewPage() {
   if (!stats) {
     return (
       <>
-        <DashboardNavbar />
+        <Navbar />
         <div className="min-h-screen bg-linear-to-br from-background to-muted p-4 md:p-8 flex items-center justify-center">
           <div className="text-center">
             <div className="text-lg text-muted-foreground">
@@ -82,7 +82,7 @@ export default function ReviewPage() {
 
   return (
     <>
-      <DashboardNavbar />
+      <Navbar />
       <div className="min-h-screen bg-linear-to-br from-background to-muted p-4 md:p-8">
         {currentPage === "entrance" && (
           <ReviewEntrance

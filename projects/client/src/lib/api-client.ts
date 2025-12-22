@@ -29,7 +29,7 @@ export const authClient = createAuthClient({
 });
 
 // 导出常用的 hooks 和方法
-export const { useSession, signIn, signUp, signOut } = authClient;
+export const { useSession, signIn, signUp, signOut, forgetPassword, resetPassword } = authClient;
 
 // 扩展 User 类型，为了在dashboard中获取 vocabularyLevel 值去判断是否可以访问dashboard
 export type ExtendedUser = {

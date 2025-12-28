@@ -15,6 +15,9 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Explanation from "./explanation";
 import UsageGuide from "./usage-guide";
+import { QuotaInfoCard } from "./quota-info";
+import { UpgradeModal } from "./upgrade-modal";
+import { useQuota } from "@/hooks/use-quota";
 import { apiClient } from "@/lib/api-client"; // 确保已导入
 import {
   showToastError,
@@ -54,10 +57,42 @@ export default function ArticleAnalysis() {
   const [isLoadingExplanations, setIsLoadingExplanations] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // 配额信息
+  const {
+    quota,
+    isLoading: isLoadingQuota,
+    refetch: refetchQuota,
+  } = useQuota();
+
+  // 升级模态框
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState<"quota" | "words">(
+    "quota"
+  );
+  const [currentWordCount, setCurrentWordCount] = useState(0);
+
+  // 计算文章字数
+  const calculateWordCount = (text: string): number => {
+    return text.split(/\s+/).filter((word) => word.trim().length > 0).length;
+  };
+
+  // 实时更新字数
+  const wordCount = calculateWordCount(articleContent);
+  const maxWords = quota?.maxArticleWords || 1000;
+  const isWordLimitExceeded = wordCount > maxWords;
+
   // 分析文章
   const handleAnalyze = async () => {
     if (!articleContent.trim()) {
       showToastWarning("请先输入文章内容", 1000);
+      return;
+    }
+
+    // 前端字数验证
+    if (isWordLimitExceeded) {
+      setCurrentWordCount(wordCount);
+      setUpgradeReason("words");
+      setUpgradeModalOpen(true);
       return;
     }
 
@@ -93,15 +128,32 @@ export default function ArticleAnalysis() {
         };
         setUnknownWords(data.data.unfamiliarWords);
         setIsAnalyzed(true);
+
+        // 刷新配额信息
+        refetchQuota();
       } else {
         throw new Error("分析失败");
       }
     } catch (error) {
       console.error("分析失败:", error);
-      showToastError(
-        error instanceof Error ? error.message : "分析失败，请重试",
-        1000
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : "分析失败，请重试";
+
+      // 检查是否是配额或字数限制错误
+      if (errorMessage.includes("每日") || errorMessage.includes("限制")) {
+        if (errorMessage.includes("超过") && errorMessage.includes("词")) {
+          // 字数超限
+          setCurrentWordCount(wordCount);
+          setUpgradeReason("words");
+          setUpgradeModalOpen(true);
+        } else {
+          // 次数超限
+          setUpgradeReason("quota");
+          setUpgradeModalOpen(true);
+        }
+      } else {
+        showToastError(errorMessage, 1000);
+      }
     } finally {
       setIsAnalyzing(false);
     }
@@ -444,6 +496,9 @@ export default function ArticleAnalysis() {
 
   return (
     <div>
+      {/* 配额信息 */}
+      {!isLoadingQuota && quota && <QuotaInfoCard quota={quota} />}
+
       <div className="grid lg:grid-cols-2 gap-6">
         {/* 左侧：文章输入 + 词汇管理（统一 Card） */}
         <Card className="flex flex-col max-h-[calc(100vh-150px)]">
@@ -466,7 +521,12 @@ export default function ArticleAnalysis() {
                 </Button>
                 <Button
                   onClick={handleAnalyze}
-                  disabled={isAnalyzing || isAnalyzed || !articleContent.trim()}
+                  disabled={
+                    isAnalyzing ||
+                    isAnalyzed ||
+                    !articleContent.trim() ||
+                    isWordLimitExceeded
+                  }
                   size="sm"
                 >
                   {isAnalyzing ? "分析中..." : "分析文章"}
@@ -489,11 +549,29 @@ export default function ArticleAnalysis() {
                 />
               </ScrollArea>
             </div>
-            {isAnalyzed && (
-              <p className="text-xs font-bold text-destructive shrink-0">
-                文章已锁定，如需修改请重新开始（可选中复制文字）
-              </p>
-            )}
+
+            {/* 字数统计和提示 */}
+            <div className="shrink-0 flex items-center justify-between text-sm">
+              <div
+                className={`font-medium ${
+                  isWordLimitExceeded
+                    ? "text-destructive"
+                    : "text-muted-foreground"
+                }`}
+              >
+                字数: {wordCount.toLocaleString()} / {maxWords.toLocaleString()}
+                {isWordLimitExceeded && (
+                  <span className="ml-2 text-xs">
+                    超出 {(wordCount - maxWords).toLocaleString()} 词
+                  </span>
+                )}
+              </div>
+              {isAnalyzed && (
+                <p className="text-xs font-bold text-destructive">
+                  文章已锁定，如需修改请重新开始
+                </p>
+              )}
+            </div>
           </CardContent>
 
           {/* 陌生词汇区域（条件渲染） */}
@@ -680,6 +758,17 @@ export default function ArticleAnalysis() {
           )}
         </Card>
       </div>
+
+      {/* 升级引导模态框 */}
+      <UpgradeModal
+        open={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        reason={upgradeReason}
+        currentUsage={{
+          wordCount: currentWordCount,
+          maxWords,
+        }}
+      />
     </div>
   );
 }

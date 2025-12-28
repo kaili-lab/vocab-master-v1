@@ -103,6 +103,6 @@ export async function saveOrUpdateArticle(
  * @param content - 文章内容
  * @returns 单词数量
  */
-function calculateWordCount(content: string): number {
+export function calculateWordCount(content: string): number {
   return content.split(/\s+/).filter((word) => word.trim().length > 0).length;
 }

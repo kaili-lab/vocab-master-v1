@@ -18,10 +18,11 @@ import { subscriptions, quotaConfigs, userLearningStats } from "../db/schema";
  * 注入到 Hono Context 的 Variables 中，供后续业务使用
  */
 export interface QuotaInfo {
-  tier: "free" | "basic" | "premium"; // 用户订阅等级
-  dailyLimit: number; // 每日限制（-1 = 无限制）
+  tier: "free" | "premium"; // 用户订阅等级
+  dailyLimit: number; // 每日限制次数
   usedToday: number; // 今日已使用次数（包含本次）
-  remainingToday: number; // 今日剩余次数（-1 = 无限制）
+  remainingToday: number; // 今日剩余次数
+  maxArticleWords: number; // 单篇文章最大词数
 }
 
 /**
@@ -55,7 +56,7 @@ export const quotaCheck = createMiddleware<{
       .limit(1);
 
     // 默认为 free 用户（没有订阅记录）
-    const tier = activeSubscription[0]?.tier || "free";
+    const tier = (activeSubscription[0]?.tier || "free") as "free" | "premium";
 
     // ========== 步骤 2：查询配额配置 ==========
     // TODO: 后续可以添加 Redis 缓存，减少数据库查询
@@ -83,6 +84,7 @@ export const quotaCheck = createMiddleware<{
     }
 
     const dailyLimit = quotaConfig.dailyLimit;
+    const maxArticleWords = quotaConfig.maxWords;
 
     // ========== 步骤 3：检查是否无限制 ==========
     if (dailyLimit === -1) {
@@ -92,6 +94,7 @@ export const quotaCheck = createMiddleware<{
         dailyLimit: -1,
         usedToday: 0,
         remainingToday: -1,
+        maxArticleWords,
       });
       await next();
       return;
@@ -169,6 +172,7 @@ export const quotaCheck = createMiddleware<{
       dailyLimit,
       usedToday,
       remainingToday,
+      maxArticleWords,
     });
 
     // 放行请求，执行业务逻辑

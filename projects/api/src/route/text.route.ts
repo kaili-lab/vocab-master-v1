@@ -26,7 +26,10 @@ import {
   saveWordMeanings,
   queryExistingMeanings,
 } from "../service/text.service";
-import { saveOrUpdateArticle } from "../service/article.service";
+import {
+  saveOrUpdateArticle,
+  calculateWordCount,
+} from "../service/article.service";
 import {
   getUserId,
   successResponse,
@@ -128,6 +131,30 @@ export const textRoute = new Hono<{
         // 检查 API Key 配置
         if (!googleApiKey) {
           return c.json({ error: "Google NLP API Key 未配置" }, 500);
+        }
+
+        // 获取配额信息并验证文章字数
+        const quotaInfo = c.get("quotaInfo");
+        const wordCount = calculateWordCount(content);
+
+        if (wordCount > quotaInfo.maxArticleWords) {
+          const tierName = quotaInfo.tier === "free" ? "免费版" : "专业版";
+          return c.json(
+            {
+              success: false,
+              error: `您的文章有 ${wordCount} 词，超过了${tierName} ${
+                quotaInfo.maxArticleWords
+              } 词的限制。${
+                quotaInfo.tier === "free"
+                  ? "请升级到专业版（最多 5,000 词）或减少文章长度。"
+                  : "请减少文章长度。"
+              }`,
+              wordCount,
+              maxWords: quotaInfo.maxArticleWords,
+              tier: quotaInfo.tier,
+            },
+            400
+          );
         }
 
         // 调用服务层分析文章

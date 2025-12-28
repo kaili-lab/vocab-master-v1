@@ -859,11 +859,10 @@ if (repetitions === 0) {
 
 ### 订阅等级
 
-| 等级                | 每日分析次数 | 单篇文章最大词数 | 价格     |
-| ------------------- | ------------ | ---------------- | -------- |
-| **Free**（免费）    | 2 次         | 3,000 词         | ¥0       |
-| **Basic**（基础）   | 20 次        | 10,000 词        | ¥9.9/月  |
-| **Premium**（高级） | 无限制       | 无限制           | ¥29.9/月 |
+| 等级              | 每日分析次数 | 单篇文章最大词数 | 价格                                |
+| ----------------- | ------------ | ---------------- | ----------------------------------- |
+| **Free**（免费）  | 2 篇         | 1,000 词         | $0                                  |
+| **Pro**（专业版） | 50 篇        | 5,000 词         | $7/月（年付 $67/年，享 20% 折扣）   |
 
 ### 配额检查流程
 
@@ -910,21 +909,22 @@ await db
 {
   id: number,
   userId: number,
-  tier: 'free' | 'basic' | 'premium',
+  tier: 'free' | 'pro',
+  billingPeriod: 'monthly' | 'yearly', // 计费周期
   status: 'active' | 'cancelled' | 'expired',
   startedAt: Date,
   expiresAt: Date,
   paymentProvider: 'alipay' | 'wechat' | 'stripe',
   amount: string,
-  currency: 'CNY' | 'USD',
+  currency: 'USD',
 }
 
 // quotaConfigs 表（配额配置）
 {
   id: number,
-  tier: 'free' | 'basic' | 'premium',
-  dailyArticlesLimit: number, // -1 = 无限制
-  maxArticleWords: number,    // -1 = 无限制
+  tier: 'free' | 'pro',
+  dailyArticlesLimit: number,
+  maxArticleWords: number,
 }
 ```
 

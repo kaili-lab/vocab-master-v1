@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { users } from "../db/schema";
-import { eq } from "drizzle-orm";
+import { users, subscriptions, quotaConfigs, userLearningStats } from "../db/schema";
+import { eq, and } from "drizzle-orm";
 import { type Bindings } from "../types/bindings";
 import type { AuthenticatedVariables } from "../types/variables";
 import { ensureAuthenticated } from "../utils/session";
@@ -166,6 +166,100 @@ export const userRoute = new Hono<{
         {
           success: false,
           error: "Failed to update user",
+        },
+        500
+      );
+    }
+  })
+  // 获取用户配额信息
+  .get("/me/quota", async (c) => {
+    const authError = ensureAuthenticated(c);
+    if (authError) return authError;
+
+    const session = c.get("session")!;
+    const userId =
+      typeof session.user.id === "string"
+        ? parseInt(session.user.id, 10)
+        : session.user.id;
+
+    try {
+      const db = c.get("db");
+
+      // 1. 查询用户的订阅等级
+      const activeSubscription = await db
+        .select({
+          tier: subscriptions.tier,
+        })
+        .from(subscriptions)
+        .where(
+          and(
+            eq(subscriptions.userId, userId),
+            eq(subscriptions.status, "active")
+          )
+        )
+        .limit(1);
+
+      const tier = (activeSubscription[0]?.tier || "free") as "free" | "premium";
+
+      // 2. 查询配额配置
+      const quotaConfigResult = await db
+        .select({
+          dailyLimit: quotaConfigs.dailyArticlesLimit,
+          maxWords: quotaConfigs.maxArticleWords,
+        })
+        .from(quotaConfigs)
+        .where(eq(quotaConfigs.tier, tier))
+        .limit(1);
+
+      const quotaConfig = quotaConfigResult?.[0];
+
+      if (!quotaConfig) {
+        return c.json(
+          {
+            success: false,
+            error: "Quota configuration not found",
+          },
+          500
+        );
+      }
+
+      // 3. 查询今日已使用次数
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const statsResult = await db
+        .select({
+          articlesAnalyzedCount: userLearningStats.articlesAnalyzedCount,
+        })
+        .from(userLearningStats)
+        .where(
+          and(
+            eq(userLearningStats.userId, userId),
+            eq(userLearningStats.date, today)
+          )
+        )
+        .limit(1);
+
+      const usedToday = statsResult?.[0]?.articlesAnalyzedCount || 0;
+      const remainingToday = quotaConfig.dailyLimit - usedToday;
+
+      // 4. 返回配额信息
+      return c.json({
+        success: true,
+        data: {
+          tier,
+          dailyLimit: quotaConfig.dailyLimit,
+          usedToday,
+          remainingToday: Math.max(0, remainingToday),
+          maxArticleWords: quotaConfig.maxWords,
+        },
+      });
+    } catch (error) {
+      console.error("Get quota error:", error);
+      return c.json(
+        {
+          success: false,
+          error: "Failed to get quota information",
         },
         500
       );

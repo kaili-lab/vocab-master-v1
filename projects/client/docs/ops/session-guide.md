@@ -225,115 +225,6 @@ const getUserInfo = async () => {
 
 ---
 
-## 🛡️ 后端如何验证 Session
-
-### 方式 1：手动 Session（推荐创建中间件）
-
-```typescript
-// 后端：auth.middleware.ts
-export const requireAuth = createMiddleware(async (c, next) => {
-  const token = c.req.header("Authorization")?.replace("Bearer ", "");
-
-  if (!token) {
-    return c.json({ error: "未登录" }, 401);
-  }
-
-  // 验证 token
-  const session = await db
-    .select()
-    .from(sessions)
-    .where(and(eq(sessions.token, token), gt(sessions.expiresAt, new Date())))
-    .limit(1);
-
-  if (!session[0]) {
-    return c.json({ error: "会话已过期" }, 401);
-  }
-
-  // 注入用户信息到 Context
-  c.set("userId", session[0].userId);
-  await next();
-});
-
-// 使用
-app.use("/api/users/*", requireAuth);
-```
-
-### 方式 2：Better Auth Session
-
-```typescript
-// 前端自动通过 Cookie 发送
-// 后端使用 Better Auth 的 getSession 验证
-const session = await auth.api.getSession({
-  headers: c.req.raw.headers,
-});
-
-if (!session) {
-  return c.json({ error: "未登录" }, 401);
-}
-```
-
----
-
-## 📊 两种 Session 对比
-
-| 特性         | 手动 Session             | Better Auth Session |
-| ------------ | ------------------------ | ------------------- |
-| **适用场景** | 无邮箱用户               | 有邮箱用户          |
-| **存储方式** | localStorage（token）    | Cookie（自动）      |
-| **传递方式** | `Authorization` header   | Cookie（自动）      |
-| **前端处理** | 需手动保存 token         | 自动管理            |
-| **后端验证** | 查询 sessions 表         | Better Auth API     |
-| **安全性**   | XSS 风险（localStorage） | CSRF 保护（Cookie） |
-
----
-
-## ⚠️ 注意事项
-
-### 1. LocalStorage vs Cookie
-
-**手动 Session（localStorage）**：
-
-- ❌ 容易受 XSS 攻击
-- ✅ 简单易用
-- ✅ 支持跨域
-
-**Better Auth（Cookie）**：
-
-- ✅ HttpOnly Cookie，防 XSS
-- ✅ 自动管理，无需手动处理
-- ⚠️ 需要配置 CORS
-
-### 2. Token 刷新
-
-当前实现：**Token 有效期 7 天**
-
-后续优化：
-
-```typescript
-// 实现 refresh token 机制
-if (isTokenExpired(token)) {
-  const newToken = await refreshToken(oldToken);
-  saveSessionToken(newToken);
-}
-```
-
-### 3. 多标签页同步
-
-LocalStorage 变化时自动同步：
-
-```typescript
-window.addEventListener("storage", (e) => {
-  if (e.key === "sessionToken") {
-    if (!e.newValue) {
-      // Token 被清除，登出
-      window.location.href = "/login";
-    }
-  }
-});
-```
-
----
-
 ## 🚀 快速开始
 
 ### 步骤 1：配置路由
@@ -434,3 +325,10 @@ localStorage.removeItem("sessionToken");
 - ✅ 工具函数自动判断和处理
 - ✅ 类型安全，TypeScript 支持
 - ✅ 简洁易用，减少重复代码
+
+---
+
+**相关文档**：
+- [客户端认证技术文档](../tech/auth-client.md)
+- [前端文档导航](../README.md)
+

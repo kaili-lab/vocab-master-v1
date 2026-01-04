@@ -92,9 +92,7 @@ export function PricingSection() {
                     <span className="text-4xl sm:text-5xl font-bold text-foreground">
                       {plan.price}
                     </span>
-                    <span className="text-muted-foreground">
-                      {plan.period}
-                    </span>
+                    <span className="text-muted-foreground">{plan.period}</span>
                   </div>
                   {plan.yearlyPrice && plan.yearlyNote && (
                     <div className="mt-2 flex items-center gap-2 text-sm">
@@ -121,7 +119,9 @@ export function PricingSection() {
 
                 {/* CTA Button */}
                 <Button
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() =>
+                    navigate(plan.isPopular ? "/checkout" : "/register")
+                  }
                   variant={plan.ctaVariant}
                   size="lg"
                   className="w-full shadow-md hover:shadow-lg transition-shadow"
@@ -135,12 +135,9 @@ export function PricingSection() {
 
         {/* Additional Info */}
         <div className="mt-12 text-center text-sm text-muted-foreground">
-          <p>
-            所有方案均支持 7 天无理由退款 · 随时可以取消订阅
-          </p>
+          <p>所有方案均支持 7 天无理由退款 · 随时可以取消订阅</p>
         </div>
       </div>
     </section>
   );
 }
-

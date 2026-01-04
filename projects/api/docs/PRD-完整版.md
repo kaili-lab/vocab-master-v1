@@ -1,5 +1,7 @@
 # Vocab Master - 产品需求文档（PRD）
 
+> 📚 **文档使用指南**：请先阅读 [全局文档体系使用指南](/DOCUMENTATION_GUIDE.md) 了解文档架构
+
 > **项目名称**：Vocab Master - 智能英语单词学习平台  
 > **文档版本**：v1.0  
 > **最后更新**：2025-01-15  
@@ -851,90 +853,91 @@ if (repetitions === 0) {
 
 ---
 
-## 3.6 配额管理模块
+## 3.6 配额管理模块 ✅ 已实现
 
 ### 功能概述
 
-基于 **订阅等级** 控制用户的每日 API 调用次数，实现成本控制和变现。
+基于 **订阅等级** 控制用户的每日文章分析次数和单篇字数限制，实现成本控制和变现。
 
 ### 订阅等级
 
-| 等级              | 每日分析次数 | 单篇文章最大词数 | 价格                                |
-| ----------------- | ------------ | ---------------- | ----------------------------------- |
-| **Free**（免费）  | 2 篇         | 1,000 词         | $0                                  |
-| **Pro**（专业版） | 50 篇        | 5,000 词         | $7/月（年付 $67/年，享 20% 折扣）   |
+| 等级                  | 每日分析次数 | 单篇字数限制 | 价格                              |
+| --------------------- | ------------ | ------------ | --------------------------------- |
+| **Free**（免费版）    | 2 篇         | 1,000 词     | $0（永久免费）                    |
+| **Premium**（专业版） | 50 篇        | 5,000 词     | $7/月（年付 $67/年，享 20% 折扣） |
 
 ### 配额检查流程
 
 ```
-用户请求分析文章
+用户请求分析文章 (POST /api/text/analyze)
   ↓
-中间件拦截请求（quotaCheck）
+quotaCheck 中间件拦截
   ↓
-查询用户订阅等级
+查询用户订阅等级（subscriptions 表）
   ↓
 查询配额配置（quotaConfigs 表）
   ↓
-查询今日已使用次数（userLearningStats）
+查询今日已使用次数（userLearningStats 表）
   ↓
-判断是否超限
-  ↓
-  ├─ 未超限：扣费（+1），放行请求
+判断次数是否超限
+  ├─ 未超限：扣费（articlesAnalyzedCount + 1），注入 quotaInfo 到上下文
   └─ 已超限：返回 429 错误
+  ↓
+text.route 字数验证
+  ↓
+计算文章字数（按空格分词）
+  ↓
+判断字数是否超限
+  ├─ 未超限：继续文章分析
+  └─ 已超限：返回 400 错误
 ```
 
-### 配额扣费逻辑
+### 核心功能
 
-```typescript
-// UPSERT 操作（原子性）
-await db
-  .insert(userLearningStats)
-  .values({
-    userId,
-    date: today,
-    articlesAnalyzedCount: 1, // 初始值
-  })
-  .onConflictDoUpdate({
-    target: [userLearningStats.userId, userLearningStats.date],
-    set: {
-      articlesAnalyzedCount: sql`${userLearningStats.articlesAnalyzedCount} + 1`,
-    },
-  });
-```
+1. **每日次数限制**：中间件在请求前检查并扣费
+2. **字数限制验证**：路由层面检查文章字数
+3. **前端配额显示**：Dashboard 显示配额卡片和进度条
+4. **实时字数统计**：前端实时显示字数，超限时禁用按钮
+5. **升级引导**：超限时弹出升级模态框
 
 ### 数据模型
 
 ```typescript
 // subscriptions 表（订阅记录）
 {
-  id: number,
   userId: number,
-  tier: 'free' | 'pro',
-  billingPeriod: 'monthly' | 'yearly', // 计费周期
+  tier: 'free' | 'premium',
   status: 'active' | 'cancelled' | 'expired',
+  stripeSubscriptionId: string,
   startedAt: Date,
   expiresAt: Date,
-  paymentProvider: 'alipay' | 'wechat' | 'stripe',
-  amount: string,
-  currency: 'USD',
 }
 
 // quotaConfigs 表（配额配置）
 {
-  id: number,
-  tier: 'free' | 'pro',
-  dailyArticlesLimit: number,
-  maxArticleWords: number,
+  tier: 'free' | 'premium',
+  dailyArticlesLimit: number,  // 每日次数限制
+  maxArticleWords: number,      // 单篇字数限制
+}
+
+// userLearningStats 表（每日使用统计）
+{
+  userId: number,
+  date: Date, // 零点时间戳（UTC）
+  articlesAnalyzedCount: number, // 当日已分析次数
 }
 ```
 
 ### API 接口
 
-| 接口                            | 方法 | 说明             |
-| ------------------------------- | ---- | ---------------- |
-| `GET /api/quota/info`           | GET  | 查询用户配额信息 |
-| `POST /api/subscription/create` | POST | 创建订阅（预留） |
-| `POST /api/subscription/cancel` | POST | 取消订阅（预留） |
+| 接口                             | 方法 | 说明                                                                         |
+| -------------------------------- | ---- | ---------------------------------------------------------------------------- |
+| `GET /api/users/me/quota`        | GET  | 查询配额信息（tier, dailyLimit, usedToday, remainingToday, maxArticleWords） |
+| `GET /api/users/me/subscription` | GET  | 查询订阅详情（tier, status, amount, expiresAt）                              |
+
+### 详细技术规范
+
+参见 `@docs/tech/quota-system.md` 获取完整的技术实现细节。
 
 ---
 
@@ -1172,7 +1175,22 @@ Cloudflare Workers（后端 API）
 
 ## 七、后续迭代计划
 
-### 7.1 近期迭代（1-3 个月）
+### 7.0 已完成功能 ✅
+
+1. **配额管理系统**
+
+   - ✅ Free (2 篇/1000 词) vs Premium (50 篇/5000 词)
+   - ✅ 每日次数限制和字数限制验证
+   - ✅ 配额显示卡片和进度条
+   - ✅ 升级引导弹窗
+
+2. **Stripe 支付集成**
+   - ✅ 订阅支付（月付/年付）
+   - ✅ Webhook 自动处理订阅生命周期
+   - ✅ 支付成功/取消页面
+   - ✅ 订阅管理页面
+
+### 7.1 近期迭代
 
 1. **激进模式开关**
 
@@ -1193,13 +1211,15 @@ Cloudflare Workers（后端 API）
    - 用户反馈入口
    - 问题支持
 
-### 7.2 中期迭代（3-6 个月）
+### 7.2 中期迭代
 
-1. **支付系统**
+1. **支付系统** ✅ 已实现 (Stripe)
 
-   - 支付宝支付
-   - 微信支付
-   - 订阅管理
+   - ✅ Stripe 订阅支付（月付 $7 / 年付 $67）
+   - ✅ Webhook 自动处理订阅状态
+   - ✅ 订阅管理页面（查看/取消订阅）
+   - ⏳ 支付宝支付（未来计划）
+   - ⏳ 微信支付（未来计划）
 
 2. **学习数据可视化**
 
@@ -1216,7 +1236,7 @@ Cloudflare Workers（后端 API）
    - 响应式设计优化
    - PWA 支持
 
-### 7.3 长期迭代（6-12 个月）
+### 7.3 长期迭代
 
 1. **社区功能**
 

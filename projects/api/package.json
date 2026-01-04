@@ -18,6 +18,8 @@
     "drizzle-orm": "^0.44.7",
     "hono": "^4.10.4",
     "openai": "^6.8.0",
+    "resend": "^6.6.0",
+    "stripe": "^20.1.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {

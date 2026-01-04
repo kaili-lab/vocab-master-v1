@@ -15,6 +15,7 @@ import { textRoute } from "./route/text.route";
 import { reviewRoute } from "./route/review.route";
 import { userKnownWordsRoute } from "./route/user-known-words.route";
 import { userLearningWordsRoute } from "./route/user-learned-meanings.route";
+import { paymentRoute } from "./route/payment.route";
 
 // 创建 Hono 应用实例
 const app = new Hono<{
@@ -52,7 +53,8 @@ const apiRoutes = app
   .route("/text", textRoute)
   .route("/review", reviewRoute)
   .route("/known-words", userKnownWordsRoute)
-  .route("/learning-words", userLearningWordsRoute);
+  .route("/learning-words", userLearningWordsRoute)
+  .route("/payment", paymentRoute);
 
 // 🎯 导出完整的 API 类型 - 供前端 Hono RPC 使用
 export type ApiRoutes = typeof apiRoutes;

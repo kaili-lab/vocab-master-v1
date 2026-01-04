@@ -16,6 +16,15 @@ export type Bindings = {
   // Resend 邮件服务
   RESEND_API_KEY: string;
 
+  // Stripe 支付配置
+  STRIPE_SECRET_KEY: string;
+  STRIPE_WEBHOOK_SECRET: string;
+  STRIPE_PRICE_MONTHLY: string; // 月付 Price ID
+  STRIPE_PRICE_YEARLY: string; // 年付 Price ID
+
+  // 前端地址（用于支付回调）
+  FRONTEND_URL?: string;
+
   // 服务器配置（可选）
   PORT?: string;
   NODE_ENV?: string;

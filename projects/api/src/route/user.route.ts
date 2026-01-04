@@ -1,7 +1,12 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { users, subscriptions, quotaConfigs, userLearningStats } from "../db/schema";
+import {
+  users,
+  subscriptions,
+  quotaConfigs,
+  userLearningStats,
+} from "../db/schema";
 import { eq, and } from "drizzle-orm";
 import { type Bindings } from "../types/bindings";
 import type { AuthenticatedVariables } from "../types/variables";
@@ -199,7 +204,9 @@ export const userRoute = new Hono<{
         )
         .limit(1);
 
-      const tier = (activeSubscription[0]?.tier || "free") as "free" | "premium";
+      const tier = (activeSubscription[0]?.tier || "free") as
+        | "free"
+        | "premium";
 
       // 2. 查询配额配置
       const quotaConfigResult = await db
@@ -260,6 +267,80 @@ export const userRoute = new Hono<{
         {
           success: false,
           error: "Failed to get quota information",
+        },
+        500
+      );
+    }
+  })
+  // 获取用户订阅信息
+  .get("/me/subscription", async (c) => {
+    const authError = ensureAuthenticated(c);
+    if (authError) return authError;
+
+    const session = c.get("session")!;
+    const userId =
+      typeof session.user.id === "string"
+        ? parseInt(session.user.id, 10)
+        : session.user.id;
+
+    try {
+      const db = c.get("db");
+
+      // 查询用户的订阅信息（包括已取消和过期的）
+      const subscriptionResult = await db
+        .select({
+          tier: subscriptions.tier,
+          status: subscriptions.status,
+          startedAt: subscriptions.startedAt,
+          expiresAt: subscriptions.expiresAt,
+          paymentProvider: subscriptions.paymentProvider,
+          paymentId: subscriptions.paymentId,
+          amount: subscriptions.amount,
+          currency: subscriptions.currency,
+        })
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId))
+        .orderBy(subscriptions.createdAt)
+        .limit(1);
+
+      // 如果没有订阅记录，返回免费版
+      if (subscriptionResult.length === 0) {
+        return c.json({
+          success: true,
+          data: {
+            tier: "free",
+            status: "active",
+            startedAt: null,
+            expiresAt: null,
+            paymentProvider: null,
+            paymentId: null,
+            amount: null,
+            currency: null,
+          },
+        });
+      }
+
+      const subscription = subscriptionResult[0];
+
+      return c.json({
+        success: true,
+        data: {
+          tier: subscription.tier,
+          status: subscription.status,
+          startedAt: subscription.startedAt,
+          expiresAt: subscription.expiresAt,
+          paymentProvider: subscription.paymentProvider,
+          paymentId: subscription.paymentId,
+          amount: subscription.amount,
+          currency: subscription.currency,
+        },
+      });
+    } catch (error) {
+      console.error("Get subscription error:", error);
+      return c.json(
+        {
+          success: false,
+          error: "Failed to get subscription information",
         },
         500
       );

@@ -4,14 +4,14 @@
   "main": "src/index.ts",
   "compatibility_date": "2025-10-11",
   "dev": {
-    "port": 3000
+    "port": 3001,
   },
   // 🔧 启用 Node.js 兼容性标志
   // 原因：Resend SDK 等第三方库内部依赖 Node.js API（如 node:crypto, node:buffer）
   // 说明：Cloudflare Workers 基于 V8 引擎，不是 Node.js 环境
   //       启用此标志后，Workers 提供 Node.js API 的兼容实现
   // 参考：projects/api/docs/EMAIL_IMPLEMENTATION.md
-  "compatibility_flags": ["nodejs_compat"]
+  "compatibility_flags": ["nodejs_compat"],
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },

@@ -85,7 +85,16 @@ export const paymentRoute = new Hono<{
 
         // 构建回调 URL（使用前端地址）
         // BETTER_AUTH_URL 是后端地址，这里需要前端地址
-        const frontendUrl = c.env.FRONTEND_URL || "http://localhost:5173";
+        const frontendUrl = c.env.FRONTEND_URL;
+        if (!frontendUrl) {
+          return c.json(
+            {
+              success: false,
+              error: "Missing FRONTEND_URL configuration",
+            },
+            500
+          );
+        }
         const successUrl = `${frontendUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
         const cancelUrl = `${frontendUrl}/payment-cancel`;
 

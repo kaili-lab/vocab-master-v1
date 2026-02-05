@@ -25,12 +25,23 @@ const app = new Hono<{
 
 // ==================== 全局中间件 ====================
 app.use("*", logger());
+const getFrontendUrl = (env: Bindings) => {
+  if (!env.FRONTEND_URL) {
+    throw new Error("Missing FRONTEND_URL in projects/api/.dev.vars");
+  }
+  return env.FRONTEND_URL;
+};
+
 app.use(
   "*",
   cors({
-    origin: ["http://localhost:5173"], // React dev server
+    origin: (origin, c) => {
+      const frontendUrl = getFrontendUrl(c.env);
+      if (!origin) return frontendUrl;
+      return origin === frontendUrl ? origin : undefined;
+    },
     credentials: true, // 支持 cookies
-  })
+  }),
 );
 
 // 应用数据库中间件（设置 DATABASE_URL）

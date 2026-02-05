@@ -20,7 +20,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useSession } from "@/lib/api-client";
+import { API_BASE_URL, useSession } from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 
 interface SubscriptionData {
@@ -49,9 +49,7 @@ export default function SubscriptionPage() {
     queryKey: ["subscription"],
     queryFn: async () => {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:3000"
-        }/api/users/me/subscription`,
+        `${API_BASE_URL}/api/users/me/subscription`,
         {
           credentials: "include",
         }
@@ -81,9 +79,7 @@ export default function SubscriptionPage() {
     try {
       // 调用后端 API 取消订阅
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:3000"
-        }/api/payment/cancel-subscription`,
+        `${API_BASE_URL}/api/payment/cancel-subscription`,
         {
           method: "POST",
           headers: {

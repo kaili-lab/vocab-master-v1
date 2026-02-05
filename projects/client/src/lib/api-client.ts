@@ -1,6 +1,6 @@
-/**
- * API Client 配置
- * 包含 Hono RPC Client 和 Better Auth Client
+﻿/**
+ * API client config.
+ * Includes Hono RPC client and Better Auth client.
  */
 
 import { hc } from "hono/client";
@@ -8,30 +8,40 @@ import { createAuthClient } from "better-auth/react";
 import { phoneNumberClient } from "better-auth/client/plugins";
 import type { ApiRoutes } from "shared";
 
-// 本地省略配置文件，如果部署到vercel或者cloudflare上，需要在Settings中添加 VITE_API_URL，并re-deploy
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// Read from .env in all environments to avoid hardcoding.
+export const API_BASE_URL = import.meta.env.VITE_API_URL;
+if (!API_BASE_URL) {
+  throw new Error("Missing VITE_API_URL in projects/client/.env");
+}
 
-// ==================== Hono RPC 客户端 ====================
-// 用于类型安全的业务 API 调用
-export const apiClient = hc<ApiRoutes>(BASE_URL, {
+// ==================== Hono RPC Client ====================
+// Type-safe business API calls.
+export const apiClient = hc<ApiRoutes>(API_BASE_URL, {
   init: {
-    credentials: "include", // 自动发送 cookies（用于 Better Auth 会话）
+    credentials: "include", // Send cookies for Better Auth sessions.
   },
 });
 
-// ==================== Better Auth 客户端 ====================
-// 用于用户认证（注册、登录、登出等）
+// ==================== Better Auth Client ====================
+// User auth flows (sign up, sign in, sign out, etc.).
 export const authClient = createAuthClient({
-  baseURL: BASE_URL,
+  baseURL: API_BASE_URL,
   plugins: [
-    phoneNumberClient(), // 🆕 添加手机号插件
+    phoneNumberClient(), // Add phone number plugin.
   ],
 });
 
-// 导出常用的 hooks 和方法
-export const { useSession, signIn, signUp, signOut, forgetPassword, resetPassword } = authClient;
+// Common hooks and methods.
+export const {
+  useSession,
+  signIn,
+  signUp,
+  signOut,
+  forgetPassword,
+  resetPassword,
+} = authClient;
 
-// 扩展 User 类型，为了在dashboard中获取 vocabularyLevel 值去判断是否可以访问dashboard
+// Extended user type for dashboard checks.
 export type ExtendedUser = {
   id: string;
   email: string;
@@ -58,24 +68,24 @@ export type ExtendedUser = {
 };
 
 /**
- * Better Auth 使用示例：
+ * Better Auth usage:
  *
- * 1. 注册：
+ * 1) Sign up
  *    const { data, error } = await signUp.email({
  *      email: "user@example.com",
  *      password: "password123",
  *      name: "User Name"
  *    })
  *
- * 2. 登录：
+ * 2) Sign in
  *    const { data, error } = await signIn.email({
  *      email: "user@example.com",
  *      password: "password123"
  *    })
  *
- * 3. 登出：
+ * 3) Sign out
  *    await signOut()
  *
- * 4. 获取会话（在组件中使用）：
+ * 4) Read session in a component
  *    const { data: session, isPending } = useSession()
  */

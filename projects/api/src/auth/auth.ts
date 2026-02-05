@@ -51,13 +51,7 @@ export const createAuth = (env: Bindings) => {
     secret: config.BETTER_AUTH_SECRET,
 
     // 🆕 信任的前端源（允许跨域请求和邮件验证回调）
-    trustedOrigins: [
-      "http://localhost:5173", // 本地开发
-      // 生产环境：部署时在 Cloudflare 环境变量中添加前端域名
-      // 或者直接在这里硬编码你的前端域名（部署后取消注释）
-      // "https://yourdomain.com",
-      // "https://vocab-master.pages.dev",
-    ],
+    trustedOrigins: config.FRONTEND_URL ? [config.FRONTEND_URL] : [],
 
     // 🔑 字段映射：将数据库字段映射到 better-auth 的标准字段
     user: {

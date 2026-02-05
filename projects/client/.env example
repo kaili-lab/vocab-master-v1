@@ -1,5 +1,5 @@
-# Stripe 公钥（pk_test_xxx for test mode, pk_live_xxx for live mode）
+# Stripe public key (pk_test_xxx for test mode, pk_live_xxx for live mode)
 VITE_STRIPE_PUBLISHABLE_KEY=""
 
-# API 基础 URL（可选，默认为 http://localhost:3000）
-# VITE_API_URL=http://localhost:3000
+# API base URL
+VITE_API_URL=http://localhost:3001

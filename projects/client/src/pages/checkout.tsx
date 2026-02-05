@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { CheckCircle2, Loader2, Sparkles, Zap, CreditCard } from "lucide-react";
 import { toast } from "sonner";
-import { useSession } from "@/lib/api-client";
+import { API_BASE_URL, useSession } from "@/lib/api-client";
 
 type BillingPeriod = "monthly" | "yearly";
 
@@ -59,9 +59,7 @@ export default function CheckoutPage() {
     try {
       // 调用后端 API 创建 Checkout Session
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:3000"
-        }/api/payment/create-checkout-session`,
+        `${API_BASE_URL}/api/payment/create-checkout-session`,
         {
           method: "POST",
           headers: {

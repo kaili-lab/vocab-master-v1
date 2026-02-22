@@ -501,7 +501,11 @@ export default function ArticleAnalysis() {
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* 左侧：文章输入 + 词汇管理（统一 Card） */}
-        <Card className="flex flex-col">
+        <Card
+          className={`flex flex-col ${
+            isAnalyzed ? "lg:max-h-[calc(133.33vh-200px)] lg:overflow-hidden" : ""
+          }`}
+        >
           {/* 文章输入区域 */}
           <CardHeader>
             <CardTitle className="text-xl lg:text-2xl">文章内容</CardTitle>
@@ -535,15 +539,16 @@ export default function ArticleAnalysis() {
             </CardAction>
           </CardHeader>
 
-          <CardContent className="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden">
-            <div className="flex-1 min-h-0">
+          <ScrollArea className={isAnalyzed ? "flex-1 min-h-0" : ""}>
+            <CardContent className="shrink-0 flex flex-col gap-4">
+            <div className="h-[350px]">
               <ScrollArea className="h-full w-full rounded-lg border">
                 <Textarea
                   value={articleContent}
                   onChange={(e) => setArticleContent(e.target.value)}
                   placeholder="粘贴您的英文文章..."
                   readOnly={isAnalyzed}
-                  className={`w-full min-h-[350px] resize-none text-base leading-relaxed border-0 focus-visible:ring-0 ${
+                  className={`w-full min-h-[350px] overflow-hidden resize-none text-base leading-relaxed border-0 focus-visible:ring-0 ${
                     isAnalyzed ? "cursor-default bg-muted/30 select-text" : ""
                   }`}
                 />
@@ -572,92 +577,93 @@ export default function ArticleAnalysis() {
                 </p>
               )}
             </div>
-          </CardContent>
+            </CardContent>
 
-          {/* 陌生词汇区域（条件渲染） */}
-          {isAnalyzed && (
-            <>
-              <div className="border-t shrink-0" />
+            {/* 陌生词汇区域（条件渲染） */}
+            {isAnalyzed && (
+              <>
+                <div className="border-t shrink-0" />
 
-              <CardHeader className="shrink-0">
-                <CardTitle className="text-xl lg:text-2xl">陌生词汇</CardTitle>
-                <CardAction>
-                  <Badge variant="secondary" className="text-xs">
-                    {unknownWords.length} 个词汇
-                  </Badge>
-                </CardAction>
-              </CardHeader>
+                <CardHeader className="shrink-0">
+                  <CardTitle className="text-xl lg:text-2xl">陌生词汇</CardTitle>
+                  <CardAction>
+                    <Badge variant="secondary" className="text-xs">
+                      {unknownWords.length} 个词汇
+                    </Badge>
+                  </CardAction>
+                </CardHeader>
 
-              <CardContent className="shrink-0 space-y-4">
-                {/* Badge 词汇列表 */}
-                <div className="w-full h-[160px]">
-                  <ScrollArea className="h-full w-full rounded-lg border bg-muted">
-                    <div className="flex flex-wrap gap-1.5 p-3 min-h-[60px]">
-                      {unknownWords.map((item) => (
-                        <Badge
-                          key={`${item.word}-${item.lemma}`}
-                          variant="default"
-                          className="px-2.5 py-1 text-xs gap-1.5"
-                        >
-                          <span>{item.word}</span>
-                          {/* 这里不使用Button组件， 因为它带有默认样式 */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleMarkAsKnown(item.word);
-                            }}
-                            className="hover:text-amber-500 hover:scale-110 transition-all duration-200"
-                            title="标记为已认识"
-                            aria-label={`标记${item.word}为已认识`}
+                <CardContent className="shrink-0 space-y-4">
+                  {/* Badge 词汇列表 */}
+                  <div className="w-full h-[160px]">
+                    <ScrollArea className="h-full w-full rounded-lg border bg-muted">
+                      <div className="flex flex-wrap gap-1.5 p-3 min-h-[60px]">
+                        {unknownWords.map((item) => (
+                          <Badge
+                            key={`${item.word}-${item.lemma}`}
+                            variant="default"
+                            className="px-2.5 py-1 text-xs gap-1.5"
                           >
-                            <CheckCircle className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveWord(item.word);
-                            }}
-                            className="hover:text-destructive hover:scale-110 transition-all duration-200"
-                            title="删除"
-                            aria-label={`删除${item.word}`}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
+                            <span>{item.word}</span>
+                            {/* 这里不使用Button组件， 因为它带有默认样式 */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMarkAsKnown(item.word);
+                              }}
+                              className="hover:text-amber-500 hover:scale-110 transition-all duration-200"
+                              title="标记为已认识"
+                              aria-label={`标记${item.word}为已认识`}
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveWord(item.word);
+                              }}
+                              className="hover:text-destructive hover:scale-110 transition-all duration-200"
+                              title="删除"
+                              aria-label={`删除${item.word}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
 
-                {/* 手动添加 */}
-                <div className="flex gap-2">
-                  <Input
-                    value={manualWord}
-                    onChange={(e) => setManualWord(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleAddWord()}
-                    placeholder="手动添加词汇..."
-                    className="text-sm"
-                  />
-                  <Button onClick={handleAddWord} variant="secondary" size="sm">
-                    <Plus className="w-4 h-4" />
+                  {/* 手动添加 */}
+                  <div className="flex gap-2">
+                    <Input
+                      value={manualWord}
+                      onChange={(e) => setManualWord(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleAddWord()}
+                      placeholder="手动添加词汇..."
+                      className="text-sm"
+                    />
+                    <Button onClick={handleAddWord} variant="secondary" size="sm">
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  <Button
+                    onClick={handleGetExplanations}
+                    disabled={
+                      isLoadingExplanations ||
+                      isSaving ||
+                      unknownWords.length === 0
+                    }
+                    className="w-full"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    {isLoadingExplanations ? "生成中..." : "获取 AI 解释"}
                   </Button>
-                </div>
-
-                <Button
-                  onClick={handleGetExplanations}
-                  disabled={
-                    isLoadingExplanations ||
-                    isSaving ||
-                    unknownWords.length === 0
-                  }
-                  className="w-full"
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  {isLoadingExplanations ? "生成中..." : "获取 AI 解释"}
-                </Button>
-              </CardContent>
-            </>
-          )}
+                </CardContent>
+              </>
+            )}
+          </ScrollArea>
         </Card>
 
         {/* 右侧：AI 解释区域 */}

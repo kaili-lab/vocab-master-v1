@@ -18,48 +18,40 @@ export function QuotaInfoCard({ quota }: QuotaInfoProps) {
   const tierColor = isFree ? "secondary" : "default";
 
   return (
-    <Card className="mb-6">
-      <CardContent className="pt-6">
-        <div className="flex items-center justify-between">
+    <Card className="mb-3 py-2.5 gap-2">
+      <CardContent className="py-0">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           {/* 左侧：订阅信息 */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2.5">
             <div className="flex items-center gap-2">
               {isFree ? (
-                <Zap className="w-5 h-5 text-muted-foreground" />
+                <Zap className="w-4 h-4 text-muted-foreground" />
               ) : (
-                <Crown className="w-5 h-5 text-primary" />
+                <Crown className="w-4 h-4 text-primary" />
               )}
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">{tierName}</span>
-                  <Badge variant={tierColor} className="text-xs">
-                    {tierName}
-                  </Badge>
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">
+              <div className="flex flex-wrap items-center gap-2 text-sm">
+                <Badge variant={tierColor} className="text-xs px-1.5 py-0">
+                  {tierName}
+                </Badge>
+                <span className="text-muted-foreground">
                   单篇最多 {quota.maxArticleWords.toLocaleString()} 词
-                </div>
+                </span>
               </div>
             </div>
 
-            <div className="h-10 w-px bg-border" />
+            <div className="h-6 w-px bg-border" />
 
             {/* 今日配额 */}
-            <div className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-muted-foreground" />
-              <div>
-                <div className="font-semibold">
-                  {isLowQuota ? (
-                    <span className="text-destructive">今日已用完</span>
-                  ) : (
-                    <span>
-                      剩余 {quota.remainingToday} / {quota.dailyLimit} 次
-                    </span>
-                  )}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  今日文章分析
-                </div>
+            <div className="flex items-center gap-1.5">
+              <FileText className="w-4 h-4 text-muted-foreground" />
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">今日文章分析</span>
+                <Badge
+                  variant={isLowQuota ? "destructive" : "secondary"}
+                  className="text-xs"
+                >
+                  剩余 {quota.remainingToday} / {quota.dailyLimit} 次
+                </Badge>
               </div>
             </div>
           </div>
@@ -76,20 +68,6 @@ export function QuotaInfoCard({ quota }: QuotaInfoProps) {
               升级到专业版
             </Button>
           )}
-        </div>
-
-        {/* 进度条 */}
-        <div className="mt-4">
-          <div className="w-full bg-secondary rounded-full h-2">
-            <div
-              className={`h-2 rounded-full transition-all ${
-                isLowQuota ? "bg-destructive" : "bg-primary"
-              }`}
-              style={{
-                width: `${(quota.usedToday / quota.dailyLimit) * 100}%`,
-              }}
-            />
-          </div>
         </div>
       </CardContent>
     </Card>

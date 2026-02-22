@@ -46,6 +46,11 @@ jobs:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
 
+      # 预装 wrangler：wrangler-action 找不到时会用 npm 安装，而 npm 不支持 workspace:* 协议
+      # 提前用 pnpm 全局安装，让 wrangler-action 直接使用已有的版本
+      - name: Install Wrangler
+        run: pnpm add -g wrangler
+
       # Pages 必须先构建再上传 dist，这里与本地 wrangler pages deploy 保持一致
       - name: Deploy Pages
         uses: cloudflare/wrangler-action@v3

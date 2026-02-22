@@ -494,20 +494,21 @@ export default function ArticleAnalysis() {
     setSelectedWords(new Set());
   };
 
+  // 统一两列面板的高度上限，配合 grid 的 stretch 行为让高度随内容同步变化
+  const synchronizedPanelMaxHeight = "lg:max-h-[calc(133.33vh-200px)]";
+
   return (
     <div>
       {/* 配额信息 */}
       {!isLoadingQuota && quota && <QuotaInfoCard quota={quota} />}
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
         {/* 左侧：文章输入 + 词汇管理（统一 Card） */}
         <Card
-          className={`flex flex-col ${
-            isAnalyzed ? "lg:max-h-[calc(133.33vh-200px)] lg:overflow-hidden" : ""
-          }`}
+          className={`flex flex-col overflow-hidden lg:h-full ${synchronizedPanelMaxHeight}`}
         >
           {/* 文章输入区域 */}
-          <CardHeader>
+          <CardHeader className="shrink-0">
             <CardTitle className="text-xl lg:text-2xl">文章内容</CardTitle>
             <CardAction>
               <div className="space-x-4">
@@ -539,44 +540,44 @@ export default function ArticleAnalysis() {
             </CardAction>
           </CardHeader>
 
-          <ScrollArea className={isAnalyzed ? "flex-1 min-h-0" : ""}>
+          <ScrollArea className="flex-1 min-h-0">
             <CardContent className="shrink-0 flex flex-col gap-4">
-            <div className="h-[350px]">
-              <ScrollArea className="h-full w-full rounded-lg border">
-                <Textarea
-                  value={articleContent}
-                  onChange={(e) => setArticleContent(e.target.value)}
-                  placeholder="粘贴您的英文文章..."
-                  readOnly={isAnalyzed}
-                  className={`w-full min-h-[350px] overflow-hidden resize-none text-base leading-relaxed border-0 focus-visible:ring-0 ${
-                    isAnalyzed ? "cursor-default bg-muted/30 select-text" : ""
-                  }`}
-                />
-              </ScrollArea>
-            </div>
+              <div className="h-[350px]">
+                <ScrollArea className="h-full w-full rounded-lg border">
+                  <Textarea
+                    value={articleContent}
+                    onChange={(e) => setArticleContent(e.target.value)}
+                    placeholder="粘贴您的英文文章..."
+                    readOnly={isAnalyzed}
+                    className={`w-full min-h-[350px] overflow-hidden resize-none text-base leading-relaxed border-0 focus-visible:ring-0 ${
+                      isAnalyzed ? "cursor-default bg-muted/30 select-text" : ""
+                    }`}
+                  />
+                </ScrollArea>
+              </div>
 
-            {/* 字数统计和提示 */}
-            <div className="shrink-0 flex items-center justify-between text-sm">
-              <div
-                className={`font-medium ${
-                  isWordLimitExceeded
-                    ? "text-destructive"
-                    : "text-muted-foreground"
-                }`}
-              >
-                字数: {wordCount.toLocaleString()} / {maxWords.toLocaleString()}
-                {isWordLimitExceeded && (
-                  <span className="ml-2 text-xs">
-                    超出 {(wordCount - maxWords).toLocaleString()} 词
-                  </span>
+              {/* 字数统计和提示 */}
+              <div className="shrink-0 flex items-center justify-between text-sm">
+                <div
+                  className={`font-medium ${
+                    isWordLimitExceeded
+                      ? "text-destructive"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  字数: {wordCount.toLocaleString()} / {maxWords.toLocaleString()}
+                  {isWordLimitExceeded && (
+                    <span className="ml-2 text-xs">
+                      超出 {(wordCount - maxWords).toLocaleString()} 词
+                    </span>
+                  )}
+                </div>
+                {isAnalyzed && (
+                  <p className="text-xs font-bold text-destructive">
+                    文章已锁定，如需修改请重新开始
+                  </p>
                 )}
               </div>
-              {isAnalyzed && (
-                <p className="text-xs font-bold text-destructive">
-                  文章已锁定，如需修改请重新开始
-                </p>
-              )}
-            </div>
             </CardContent>
 
             {/* 陌生词汇区域（条件渲染） */}
@@ -667,7 +668,9 @@ export default function ArticleAnalysis() {
         </Card>
 
         {/* 右侧：AI 解释区域 */}
-        <Card className="flex flex-col">
+        <Card
+          className={`flex flex-col overflow-hidden lg:h-full ${synchronizedPanelMaxHeight}`}
+        >
           <CardHeader className="shrink-0">
             <CardTitle className="text-xl lg:text-2xl">AI 词汇解释</CardTitle>
             {explanations.length > 0 && (
@@ -716,52 +719,56 @@ export default function ArticleAnalysis() {
             )}
           </CardHeader>
 
-          <CardContent className="flex-1 min-h-0">
-            {/* 解释卡片容器 */}
-            {explanations.length > 0 ? (
-              <Explanation
-                explanations={explanations}
-                selectedWords={selectedWords}
-                toggleWordSelection={toggleWordSelection}
-              />
-            ) : (
-              <UsageGuide />
+          <ScrollArea className="flex-1 min-h-0">
+            <CardContent className="shrink-0">
+              {/* 解释卡片容器 */}
+              {explanations.length > 0 ? (
+                <div className="pr-2">
+                  <Explanation
+                    explanations={explanations}
+                    selectedWords={selectedWords}
+                    toggleWordSelection={toggleWordSelection}
+                  />
+                </div>
+              ) : (
+                <UsageGuide />
+              )}
+            </CardContent>
+
+            {explanations.length > 0 && (
+              <CardFooter className="shrink-0 flex-col gap-2 pt-4 border-t">
+                {/* 批量操作按钮 */}
+                <div className="flex gap-2 w-full">
+                  <Button
+                    onClick={handleAddToVocabulary}
+                    disabled={selectedWords.size === 0 || isSaving}
+                    className="flex-1"
+                  >
+                    {isSaving
+                      ? "保存中..."
+                      : `加入词汇表 (${selectedWords.size})`}
+                  </Button>
+                  <Button
+                    onClick={handleToggleAll}
+                    variant="outline"
+                    disabled={isSaving || explanations.length === 0}
+                  >
+                    {selectedWords.size === explanations.length ? "取消" : "全选"}
+                  </Button>
+                </div>
+
+                <Button
+                  onClick={handleReset}
+                  variant="ghost"
+                  size="sm"
+                  className="w-full"
+                  disabled={isAnalyzing || isLoadingExplanations || isSaving}
+                >
+                  重新开始
+                </Button>
+              </CardFooter>
             )}
-          </CardContent>
-
-          {explanations.length > 0 && (
-            <CardFooter className="shrink-0 flex-col gap-2 pt-4 border-t">
-              {/* 批量操作按钮 */}
-              <div className="flex gap-2 w-full">
-                <Button
-                  onClick={handleAddToVocabulary}
-                  disabled={selectedWords.size === 0 || isSaving}
-                  className="flex-1"
-                >
-                  {isSaving
-                    ? "保存中..."
-                    : `加入词汇表 (${selectedWords.size})`}
-                </Button>
-                <Button
-                  onClick={handleToggleAll}
-                  variant="outline"
-                  disabled={isSaving || explanations.length === 0}
-                >
-                  {selectedWords.size === explanations.length ? "取消" : "全选"}
-                </Button>
-              </div>
-
-              <Button
-                onClick={handleReset}
-                variant="ghost"
-                size="sm"
-                className="w-full"
-                disabled={isAnalyzing || isLoadingExplanations || isSaving}
-              >
-                重新开始
-              </Button>
-            </CardFooter>
-          )}
+          </ScrollArea>
         </Card>
       </div>
 

@@ -1,6 +1,5 @@
 import { Checkbox } from "@radix-ui/react-checkbox";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { highlightWordInSentence } from "@/utils/text-utils";
 
 interface ExplanationItem {
@@ -52,16 +51,15 @@ export default function Explanation({
   };
 
   return (
-    <ScrollArea className="h-full w-full">
-      <div className="space-y-2 pr-2">
-        {/* 
+    <div className="space-y-2">
+      {/* 
           重要：展示所有单词解释，包括 isExisting: true 的单词
           这些单词虽然不可保存，但需要在UI中展示，让用户了解：
           1. 系统识别出了这些单词
           2. AI判断这些单词的含义用户已掌握
           3. 提供完整的词汇分析视图
-        */}
-        {explanations.map((item) => {
+      */}
+      {explanations.map((item) => {
         const isSelected = selectedWords.has(item.word);
         const isDisabled = item.isExisting; // existing 类型不可选择，但仍需正常展示
 
@@ -127,8 +125,7 @@ export default function Explanation({
             </div>
           </div>
         );
-        })}
-      </div>
-    </ScrollArea>
+      })}
+    </div>
   );
 }

@@ -13,7 +13,20 @@
 
 🔗 **在线体验：** _即将上线_ · [English](./README.md)
 
-<!-- ![应用截图](./screenshot.png) -->
+---
+
+## 界面截图
+
+<img src="docs/screenshots/分析结果.jpg" width="800" alt="AI 分析结果 — 粘贴文章，AI 识别生词并结合上下文解释">
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/卡片复习.jpg" width="392" alt="闪卡复习 — SM-2 间隔重复，支持再来一次 / 有点难 / 还不错 / 很简单四档评级"></td>
+    <td><img src="docs/screenshots/新词汇列表.jpg" width="392" alt="词汇列表 — 所有保存的单词，含释义、复习次数和添加时间"></td>
+  </tr>
+</table>
+
+<img src="docs/screenshots/订阅列表.jpg" width="800" alt="订阅方案 — 免费版与专业版对比，Stripe 支付">
 
 ---
 

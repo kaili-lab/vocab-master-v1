@@ -13,7 +13,20 @@ Paste any article → AI identifies words you don't know and explains them in co
 
 🔗 **Live Demo:** _coming soon_ · [中文文档](./README_CN.md)
 
-<!-- ![App Screenshot](./screenshot.png) -->
+---
+
+## Screenshots
+
+<img src="docs/screenshots/分析结果.jpg" width="800" alt="AI Analysis Dashboard — paste an article, AI identifies unfamiliar words and explains them in context">
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/卡片复习.jpg" width="392" alt="Flashcard Review — SM-2 spaced repetition with Again / Hard / Good / Easy ratings"></td>
+    <td><img src="docs/screenshots/新词汇列表.jpg" width="392" alt="Vocabulary List — all saved words with meanings, review count, and timestamps"></td>
+  </tr>
+</table>
+
+<img src="docs/screenshots/订阅列表.jpg" width="800" alt="Subscription Plans — Free vs Premium with Stripe-powered checkout">
 
 ---
 

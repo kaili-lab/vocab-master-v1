@@ -149,7 +149,7 @@ stripe events resend <event_id>
 
 ---
 
-## 四、用户角色系统
+## 三、用户角色系统
 
 ### 现状
 
@@ -159,7 +159,7 @@ stripe events resend <event_id>
 
 ---
 
-## 五、数据库初始化清单
+## 四、数据库初始化清单
 
 以下数据需要在数据库迁移（`drizzle-kit push`）完成后**手动初始化**，否则相关功能无法使用：
 
@@ -183,7 +183,7 @@ npx tsx scripts/init-quota-config.ts
 
 ---
 
-## 六、已知问题与待修复项
+## 五、已知问题与待修复项
 
 ### [已修复] basic 等级残留
 - **问题**：数据库枚举定义了 `basic`，但从未在业务中使用，`quota_configs` 也无对应记录，若数据库误存 `basic` 用户会导致配额查询失败。

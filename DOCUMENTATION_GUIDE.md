@@ -183,34 +183,39 @@ curl http://localhost:8787/api/quota/info
 
 ```
 vocab-master/
-├── DOCUMENTATION_GUIDE.md          # 本文档（使用指南）
+├── CLAUDE.md                        # AI 开发指南（开发环境、架构、常见问题）
+├── DOCUMENTATION_GUIDE.md           # 本文档（文档体系使用指南）
+├── DEPLOY_CLOUDFLARE_GITHUB_ACTIONS.md  # Cloudflare 部署手册
+├── docs/
+│   ├── project-logic.md             # 核心业务逻辑、设计决策、已知问题（补充 CLAUDE.md）
+│   └── screenshots/                 # README 截图资源
 ├── projects/
-│   ├── api/docs/                   # 后端文档
-│   │   ├── README.md               # 后端导航中心（心法层）
-│   │   ├── PRD-完整版.md           # 产品需求文档（心法层）
-│   │   ├── tech/                   # 技术文档（大脑层）
-│   │   │   ├── architecture.md     # 系统架构
-│   │   │   ├── auth-system.md      # 认证系统
-│   │   │   ├── quota-system.md     # 配额系统
-│   │   │   ├── stripe-integration.md  # Stripe集成
-│   │   │   ├── database-guide.md   # 数据库指南
-│   │   │   ├── email-system.md     # 邮件系统
-│   │   │   └── bindings-types.md   # 环境变量类型
-│   │   └── ops/                    # 操作文档（手册层）
-│   │       ├── deployment.md       # 部署指南
-│   │       ├── config-guide.md     # 配置说明
-│   │       ├── quota-testing.md    # 配额测试
-│   │       └── stripe-setup.md     # Stripe设置
-│   └── client/docs/                # 前端文档
-│       ├── README.md               # 前端导航中心（心法层）
-│       ├── tech/                   # 技术文档（大脑层）
-│       │   ├── auth-client.md      # 客户端认证
-│       │   └── theme-system.md     # 主题系统
-│       └── ops/                    # 操作文档（手册层）
-│           ├── session-guide.md    # Session使用指南
-│           ├── theme-usage.md      # 主题使用指南
-│           ├── dev-setup.md        # 开发环境配置
-│           └── feature-logs.md     # 功能实现记录
+│   ├── api/docs/                    # 后端文档
+│   │   ├── README.md                # 后端导航中心（心法层）
+│   │   ├── PRD-完整版.md            # 产品需求文档（心法层）
+│   │   ├── tech/                    # 技术文档（大脑层）
+│   │   │   ├── architecture.md      # 系统架构
+│   │   │   ├── auth-system.md       # 认证系统
+│   │   │   ├── quota-system.md      # 配额系统
+│   │   │   ├── stripe-integration.md   # Stripe集成
+│   │   │   ├── database-guide.md    # 数据库指南
+│   │   │   ├── email-system.md      # 邮件系统
+│   │   │   └── bindings-types.md    # 环境变量类型
+│   │   └── ops/                     # 操作文档（手册层）
+│   │       ├── deployment.md        # 部署指南
+│   │       ├── config-guide.md      # 配置说明
+│   │       ├── quota-testing.md     # 配额测试
+│   │       └── stripe-setup.md      # Stripe设置
+│   └── client/docs/                 # 前端文档
+│       ├── README.md                # 前端导航中心（心法层）
+│       ├── tech/                    # 技术文档（大脑层）
+│       │   ├── auth-client.md       # 客户端认证
+│       │   └── theme-system.md      # 主题系统
+│       └── ops/                     # 操作文档（手册层）
+│           ├── session-guide.md     # Session使用指南
+│           ├── theme-usage.md       # 主题使用指南
+│           ├── dev-setup.md         # 开发环境配置
+│           └── feature-logs.md      # 功能实现记录
 ```
 
 ---
@@ -593,7 +598,6 @@ npm install -g wrangler
 
 ---
 
-**最后更新**：2026-01-05
-**版本**：v1.0
-**维护者**：项目团队
+**最后更新**：2026-02-22
+**版本**：v1.1
 

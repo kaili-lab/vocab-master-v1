@@ -17,7 +17,7 @@ import { eq, and } from "drizzle-orm";
  */
 export function initStripe(secretKey: string): Stripe {
   return new Stripe(secretKey, {
-    apiVersion: "2025-12-15.clover",
+    apiVersion: "2026-01-28.clover",
   });
 }
 
@@ -114,7 +114,8 @@ export function verifyWebhookSignature(
  */
 export async function handleCheckoutCompleted(
   db: DB,
-  session: Stripe.Checkout.Session
+  session: Stripe.Checkout.Session,
+  stripe: Stripe
 ): Promise<void> {
   try {
     const userId = session.metadata?.userId || session.client_reference_id;
@@ -132,13 +133,12 @@ export async function handleCheckoutCompleted(
       ? (session.amount_total / 100).toFixed(2)
       : "0";
 
-    // 计算过期时间（月付30天，年付365天）
-    const expiresAt = new Date();
-    if (billingPeriod === "yearly") {
-      expiresAt.setDate(expiresAt.getDate() + 365);
-    } else {
-      expiresAt.setDate(expiresAt.getDate() + 30);
-    }
+    // 从 Stripe 获取订阅详情，以取得真实的 current_period_end
+    const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const currentPeriodEnd = (stripeSubscription as any).current_period_end;
+    const expiresAt = currentPeriodEnd
+      ? new Date(currentPeriodEnd * 1000)
+      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // fallback: 30天
 
     // 检查用户是否已有订阅
     const existingSubscription = await db

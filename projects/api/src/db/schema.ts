@@ -38,7 +38,6 @@ export const vocabularyLevelEnum = pgEnum("vocabulary_level", [
 // 订阅等级枚举
 export const subscriptionTierEnum = pgEnum("subscription_tier", [
   "free",
-  "basic",
   "premium",
 ]);
 
@@ -58,7 +57,7 @@ export const paymentProviderEnum = pgEnum("payment_provider", [
 ]);
 
 // 🔄 修改：货币改为 pgEnum
-export const currencyEnum = pgEnum("currency", ["CNY", "USD"]);
+export const currencyEnum = pgEnum("currency", ["USD"]);
 
 // 文章状态枚举
 export const articleStatusEnum = pgEnum("article_status", [
@@ -251,7 +250,7 @@ export const subscriptions = pgTable(
     paymentProvider: paymentProviderEnum("payment_provider"),
     paymentId: varchar("payment_id", { length: 255 }), // 支付平台返回的订单ID
     amount: varchar("amount", { length: 20 }), // 金额，使用 string 避免浮点数问题，格式如 "99.00"
-    currency: currencyEnum("currency").default("CNY"),
+    currency: currencyEnum("currency").default("USD"),
 
     // 元信息
     metadata: varchar("metadata", { length: 1000 }), // JSON string，存储额外信息（促销码、来源等）
@@ -469,7 +468,7 @@ export type NewUserLearningStats = typeof userLearningStats.$inferInsert;
  * 3. 便于管理员通过 Admin 界面动态调整配额
  *
  * 设计要点：
- * - 每个订阅等级（free/basic/premium）对应一行记录
+ * - 每个订阅等级（free/premium）对应一行记录
  * - -1 表示无限制（如 premium 用户）
  * - 配置修改后立即生效（结合 Redis 缓存需要失效缓存）
  */
@@ -481,12 +480,12 @@ export const quotaConfigs = pgTable("quota_configs", {
 
   // 每日文章分析次数限制
   // -1 = 无限制，0 = 禁止使用，>0 = 具体次数
-  // 示例：free = 2, basic = 20, premium = -1
+  // 示例：free = 2, premium = 50
   dailyArticlesLimit: integer("daily_articles_limit").notNull(),
 
   // 单篇文章最大词数限制
   // -1 = 无限制，>0 = 具体词数
-  // 示例：free = 3000, basic = 10000, premium = -1
+  // 示例：free = 1000, premium = 5000
   maxArticleWords: integer("max_article_words").notNull(),
 
   // 预留字段：新用户首日奖励次数（可选，暂未使用）

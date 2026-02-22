@@ -501,7 +501,7 @@ export default function ArticleAnalysis() {
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* 左侧：文章输入 + 词汇管理（统一 Card） */}
-        <Card className="flex flex-col max-h-[calc(100vh-150px)]">
+        <Card className="flex flex-col">
           {/* 文章输入区域 */}
           <CardHeader>
             <CardTitle className="text-xl lg:text-2xl">文章内容</CardTitle>
@@ -661,7 +661,7 @@ export default function ArticleAnalysis() {
         </Card>
 
         {/* 右侧：AI 解释区域 */}
-        <Card className="flex flex-col max-h-[calc(100vh-150px)] overflow-hidden">
+        <Card className="flex flex-col">
           <CardHeader className="shrink-0">
             <CardTitle className="text-xl lg:text-2xl">AI 词汇解释</CardTitle>
             {explanations.length > 0 && (
@@ -710,7 +710,7 @@ export default function ArticleAnalysis() {
             )}
           </CardHeader>
 
-          <CardContent className="flex-1 min-h-0 overflow-hidden">
+          <CardContent className="flex-1 min-h-0">
             {/* 解释卡片容器 */}
             {explanations.length > 0 ? (
               <Explanation

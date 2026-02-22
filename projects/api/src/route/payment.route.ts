@@ -162,7 +162,7 @@ export const paymentRoute = new Hono<{
         case "checkout.session.completed": {
           // 支付完成事件 - 确认支付成功
           const session = event.data.object;
-          await handleCheckoutCompleted(db, session);
+          await handleCheckoutCompleted(db, session, stripe);
           break;
         }
 

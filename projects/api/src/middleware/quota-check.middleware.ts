@@ -9,7 +9,7 @@ import { subscriptions, quotaConfigs, userLearningStats } from "../db/schema";
  *
  * 用途：
  * 1. 在文章分析接口前进行配额校验，防止超额使用 API
- * 2. 根据用户订阅等级（free/basic/premium）控制每日分析次数
+ * 2. 根据用户订阅等级（free/premium）控制每日分析次数
  * 3. 使用数据库事务和行锁防止并发绕过限制
  */
 

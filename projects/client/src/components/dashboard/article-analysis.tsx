@@ -494,8 +494,8 @@ export default function ArticleAnalysis() {
     setSelectedWords(new Set());
   };
 
-  // 统一两列面板的高度上限，配合 grid 的 stretch 行为让高度随内容同步变化
-  const synchronizedPanelMaxHeight = "lg:max-h-[calc(133.33vh-200px)]";
+  // 高度上限改为更接近可视区，避免右侧内容过多时把两列整体撑得过高
+  const synchronizedPanelMaxHeight = "lg:max-h-[calc(100vh-220px)]";
 
   return (
     <div>
@@ -542,14 +542,14 @@ export default function ArticleAnalysis() {
 
           <ScrollArea className="flex-1 min-h-0">
             <CardContent className="shrink-0 flex flex-col gap-4">
-              <div className="h-[350px]">
+              <div className="h-[350px] lg:h-[420px]">
                 <ScrollArea className="h-full w-full rounded-lg border">
                   <Textarea
                     value={articleContent}
                     onChange={(e) => setArticleContent(e.target.value)}
                     placeholder="粘贴您的英文文章..."
                     readOnly={isAnalyzed}
-                    className={`w-full min-h-[350px] overflow-hidden resize-none text-base leading-relaxed border-0 focus-visible:ring-0 ${
+                    className={`w-full min-h-[350px] lg:min-h-[420px] overflow-hidden resize-none text-base leading-relaxed border-0 focus-visible:ring-0 ${
                       isAnalyzed ? "cursor-default bg-muted/30 select-text" : ""
                     }`}
                   />

@@ -51,7 +51,7 @@ export default function Explanation({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       {/* 
           重要：展示所有单词解释，包括 isExisting: true 的单词
           这些单词虽然不可保存，但需要在UI中展示，让用户了解：
@@ -66,14 +66,14 @@ export default function Explanation({
         return (
           <div
             key={item.word}
-            className={`border-2 rounded-lg p-3 transition-colors ${
+            className={`border-2 rounded-lg p-2.5 transition-colors ${
               isSelected
                 ? "border-primary bg-primary/5 cursor-pointer"
                 : "border-border hover:border-primary/50 cursor-pointer"
             } ${isDisabled ? "cursor-not-allowed" : ""}`}
             onClick={() => !isDisabled && toggleWordSelection(item.word)}
           >
-            <div className="flex items-start gap-2.5">
+            <div className="flex items-start gap-2">
               <Checkbox
                 checked={isSelected}
                 disabled={isDisabled}
@@ -84,7 +84,7 @@ export default function Explanation({
               />
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1.5">
+                <div className="mb-1 flex items-center gap-1.5">
                   <h3 className="text-base font-bold text-foreground">
                     {item.word}
                     {item.pos && (
@@ -96,7 +96,7 @@ export default function Explanation({
                   {getTypeBadge(item.type)}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {/* 含义解释部分 */}
                   <div className="text-sm text-foreground">
                     <span className="font-bold">含义：</span>

@@ -11,7 +11,7 @@ Paste any article → AI identifies words you don't know and explains them in co
 
 ---
 
-🔗 **Live Demo:** _coming soon_ · [中文文档](./README_CN.md)
+🔗 **Live Demo:** [vocab.kaili.dev](https://vocab.kaili.dev) · [中文文档](./README_CN.md)
 
 > **Demo account:** `test@test.com` / `123456` (Free tier)
 

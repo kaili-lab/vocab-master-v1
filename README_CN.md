@@ -11,7 +11,7 @@
 
 ---
 
-🔗 **在线体验：** _即将上线_ · [English](./README.md)
+🔗 **在线体验：** [vocab.kaili.dev](https://vocab.kaili.dev) · [English](./README.md)
 
 > **演示账号：** `test@test.com` / `123456`（Free 套餐）
 
